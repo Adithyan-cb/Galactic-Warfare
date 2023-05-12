@@ -26,7 +26,7 @@ intro_sound = pygame.mixer.Sound("audio/bg-music.mp3")
 
 #game over background
 gameover_bg = pygame.image.load("assets/background/gameover-bg.png").convert()
-
+gameover_sound = pygame.mixer.Sound("audio/gameover-sound.mp3")
 # score 
 score_font = pygame.font.Font("assets/font2.ttf",20)
 def score():
@@ -79,7 +79,6 @@ while True:
             if event.type == timer:
                 for i in range(3):
                     asteroid_group.add(asteroids.Astroids(random.choice(meteros)))
-                #laser_audio.play()
         if GAME_OVER:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
@@ -88,7 +87,7 @@ while True:
                     start_time =  int(pygame.time.get_ticks()/1000) - start_time
 
     if INTRO_ACTIVE:
-        #intro_sound.play()
+        intro_sound.play()
         screen.blit(intro_bg,(0,0))
 
     #scrolling feature
@@ -115,8 +114,9 @@ while True:
             GAME_OVER = True
 
     if GAME_OVER:
+        gameover_sound.play()
         screen.blit(gameover_bg,(0,0))
-
+        
     clock.tick(60)
     pygame.display.update()
 
