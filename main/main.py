@@ -4,7 +4,7 @@ import random
 import sys
 import playerShip
 import asteroids
-
+import json
 # game set-up
 pygame.init()
 clock = pygame.time.Clock()
@@ -20,51 +20,70 @@ bg_height = space.get_height()
 scroll = 0
 panel = math.ceil(HEIGHT / bg_height ) + 3
 
-# intro background
+#
 intro_bg = pygame.image.load("assets/background/intro-bg.png").convert()
 intro_sound = pygame.mixer.Sound("audio/bg-music.mp3")
 
-#game over background
+#----GAME OVER BACKGROUND----
 gameover_bg = pygame.image.load("assets/background/gameover-bg.png").convert()
 gameover_sound = pygame.mixer.Sound("audio/gameover-sound.mp3")
-# score 
+
+# ------SCORE----------
+score_data = {"score":0}
+with open("score.txt") as score_file:
+    high = json.load(score_file)
+
+high_score = high["score"]
 score_font = pygame.font.Font("assets/font2.ttf",20)
-def score():
-    current_time = int(pygame.time.get_ticks() / 1000) - start_time
+current_score = 0
+def score(time):
+    score_data["score"] = time
     txt_surf = score_font.render("score: ",False,"White")
     txt_rect = txt_surf.get_rect(center = (50,10))
-    score_surf = score_font.render(f"{current_time}",False,'White')
+    score_surf = score_font.render(f"{time}",False,'White')
     score_rect = score_surf.get_rect(center = (97,10))
     screen.blit(score_surf,score_rect)
     screen.blit(txt_surf,txt_rect)
 
-# collision function
+def score_render(score):
+    highscore_surf = score_font.render(f'High score: {score} ',False,"White")
+    highscore_rect = highscore_surf.get_rect(center = (400,55))
+    screen.blit(highscore_surf,highscore_rect)
+
+
+score_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(score_timer,1500)
+
+# -------COLLISION FUNCTION-----
 def collision():
     if pygame.sprite.spritecollide(playerShip_group.sprite,asteroid_group,False):
             asteroid_group.empty()
             return True
     else:
         return False
-    
-start_time = 0
-#player ship
+
+#----PLAYERSHIP----
 ship = playerShip.PlayerShip()
 playerShip_group = pygame.sprite.GroupSingle()
 playerShip_group.add(ship)
 
-# asteroids
+#----ASTEROIDS----
 asteroid_group = pygame.sprite.Group()
 meteros = ['meteor','flaming','meteor','meteor','flaming','meteor','meteor']
 timer = pygame.USEREVENT + 1
 pygame.time.set_timer(timer,1500)
 
-# game loop
+#---STATE ACIVATORS---
 GAME_ACTIVE = False
 INTRO_ACTIVE = True
 GAME_OVER = False
+
+#----GAME LOOP----
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("score.txt","w") as score_file:
+                json.dump(score_data,score_file)
             pygame.quit()
             sys.exit()
 
@@ -79,18 +98,25 @@ while True:
             if event.type == timer:
                 for i in range(3):
                     asteroid_group.add(asteroids.Astroids(random.choice(meteros)))
+
+            if event.type == score_timer:
+                current_score += 1
+
         if GAME_OVER:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
+                    with open("score.txt","w") as score_file:
+                        json.dump(score_data,score_file)
                     GAME_ACTIVE = True
                     GAME_OVER = False
-                    start_time =  int(pygame.time.get_ticks()/1000) - start_time
+                    current_score = 0
 
+    #----GAME INTRO-----
     if INTRO_ACTIVE:
         intro_sound.play()
         screen.blit(intro_bg,(0,0))
-
-    #scrolling feature
+        
+    #---MAIN GAME------
     if GAME_ACTIVE:
         for i in range(panel):
             screen.blit(space,(0, i * bg_height + scroll - bg_height))
@@ -104,23 +130,23 @@ while True:
         asteroid_group.draw(screen)
         asteroid_group.update()
 
-        #score
-        score()
+        #----SCORE----
+        score(current_score)
 
-        #collision
+        #----COLLISION----
         collision_checker = collision()
         if collision_checker:
             GAME_ACTIVE = False
             GAME_OVER = True
 
+    #----GAME OVER----
     if GAME_OVER:
-        gameover_sound.play()
+        #gameover_sound.play()
         screen.blit(gameover_bg,(0,0))
-        
-    clock.tick(60)
-    pygame.display.update()
+        if current_score < high_score:
+            score_render(high_score)
+        else:
+           score_render(current_score)
 
-# create game over interface
-# create levels
-# track score
-# display score on game over interface 
+    clock.tick(60)
+    pygame.display.update() 
