@@ -34,7 +34,7 @@ with open("score.txt") as score_file:
     high = json.load(score_file)
 
 high_score = high["score"]
-score_font = pygame.font.Font("assets/font2.ttf",20)
+score_font = pygame.font.Font("assets/background/font2.ttf",20)
 current_score = 0
 def score(time):
     score_data["score"] = time
