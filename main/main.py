@@ -82,8 +82,9 @@ GAME_OVER = False
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            with open("score.txt","w") as score_file:
-                json.dump(score_data,score_file)
+            if current_score >=  high_score:
+                with open("score.txt","w") as score_file:
+                    json.dump(score_data,score_file)
             pygame.quit()
             sys.exit()
 
@@ -105,8 +106,9 @@ while True:
         if GAME_OVER:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    with open("score.txt","w") as score_file:
-                        json.dump(score_data,score_file)
+                    if current_score > high_score:
+                        with open("score.txt","w") as score_file:
+                            json.dump(score_data,score_file)
                     GAME_ACTIVE = True
                     GAME_OVER = False
                     current_score = 0
@@ -146,7 +148,8 @@ while True:
         if current_score < high_score:
             score_render(high_score)
         else:
-           score_render(current_score)
+           high_score = current_score
+           score_render(high_score)
 
     clock.tick(60)
     pygame.display.update() 
