@@ -5,6 +5,7 @@ import sys
 import playerShip
 import asteroids
 import json
+import os
 # game set-up
 pygame.init()
 clock = pygame.time.Clock()
@@ -30,6 +31,11 @@ gameover_sound = pygame.mixer.Sound("audio/gameover-sound.mp3")
 
 # ------SCORE----------
 score_data = {"score":0}
+
+if not os.path.exists("score.txt"):
+    with open("score.txt","w") as score_file:
+        json.dump(score_data,score_file)
+    
 with open("score.txt") as score_file:
     high = json.load(score_file)
 
@@ -97,7 +103,7 @@ while True:
 
         if GAME_ACTIVE:
             if event.type == timer:
-                for i in range(3):
+                for i in range(5):
                     asteroid_group.add(asteroids.Astroids(random.choice(meteros)))
 
             if event.type == score_timer:

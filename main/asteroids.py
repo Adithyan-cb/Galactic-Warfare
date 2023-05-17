@@ -12,7 +12,7 @@ class Astroids(pygame.sprite.Sprite):
             self.speed = 8
         
         self.image = self.meteor
-        self.rect = self.image.get_rect(midtop = (random.randint(0,748),-10))
+        self.rect = self.image.get_rect(midtop = (random.randint(0,765),-10))
 
     def destory(self):
         if self.rect.y > 430:
