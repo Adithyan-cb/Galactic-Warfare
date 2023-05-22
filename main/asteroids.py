@@ -6,10 +6,10 @@ class Astroids(pygame.sprite.Sprite):
         super().__init__()
         if type == "flaming":
             self.meteor = pygame.image.load("assets/asteroids/flaming_meteor.png").convert_alpha()
-            self.speed = 10
+            self.speed = 7
         else:
             self.meteor = pygame.image.load("assets/asteroids/meteor.png").convert_alpha()
-            self.speed = 8
+            self.speed = 5
         
         self.image = self.meteor
         self.rect = self.image.get_rect(midtop = (random.randint(0,765),-10))
