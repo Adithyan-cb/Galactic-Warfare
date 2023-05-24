@@ -1,6 +1,5 @@
 import pygame
-# player ship class
-
+#----PLAYER SHIP CLASS----
 class PlayerShip(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
