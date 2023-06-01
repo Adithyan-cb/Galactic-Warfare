@@ -6,6 +6,7 @@ import playerShip
 import asteroids
 import json
 import os
+
 #---SETUP----
 pygame.init()
 clock = pygame.time.Clock()
@@ -21,14 +22,16 @@ bg_height = space.get_height()
 scroll = 0
 panel = math.ceil(HEIGHT / bg_height ) + 3
 ingame_sound = pygame.mixer.Sound("audio/ingame.mp3")
+
 #---GAME INTRO BACKGROUND AND SOUND---
 intro_bg = pygame.image.load("assets/background/intro-bg.png").convert()
 intro_sound = pygame.mixer.Sound("audio/bg-music.mp3")
 
 #----GAME OVER BACKGROUND AND SOUND----
 gameover_bg = pygame.image.load("assets/background/gameover-bg.png").convert()
-gameover_sound = pygame.mixer.Sound("audio/gameover-sound.mp3")        
-# ------SCORE----------
+gameover_sound = pygame.mixer.Sound("audio/gameover-sound.mp3")
+
+# ------SCORE TRACKING AND SAVING----------
 score_data = {"score":0}
 
 if not os.path.exists("score.txt"):
@@ -41,6 +44,7 @@ with open("score.txt") as score_file:
 high_score = high["score"]
 score_font = pygame.font.Font("assets/background/font2.ttf",20)
 current_score = 0
+
 def score(time):
     score_data["score"] = time
     txt_surf = score_font.render("score: ",False,"White")
@@ -86,6 +90,7 @@ GAME_OVER = False
 
 #----GAME LOOP----
 while True:
+    # ---QUITING AND SAING GAME SCORE---
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             if current_score >=  high_score:
@@ -94,13 +99,14 @@ while True:
             pygame.quit()
             sys.exit()
 
-
+        #---GAME RESTART---
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 pygame.mixer.Sound.stop(intro_sound)
                 INTRO_ACTIVE = False
                 GAME_ACTIVE = True
-
+        
+        #---SPAWNING ASTEROIDS---
         if GAME_ACTIVE:
             if event.type == timer:
                 for i in range(5):
@@ -109,10 +115,11 @@ while True:
                 for scores in big_asteroids:
                     if current_score == scores:
                         asteroid_group.add(asteroids.Astroids("bigAsteroid"))
-
+            
             if event.type == score_timer:
                 current_score += 1
-
+                
+        #---WHEN THE GAME OVER---
         if GAME_OVER:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
@@ -165,6 +172,7 @@ while True:
         else:
            high_score = current_score
            score_render(high_score)
-
+    
+    #---FPS---
     clock.tick(60)
     pygame.display.update() 
